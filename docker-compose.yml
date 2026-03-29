@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: stikerly_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stikerly_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/stikerly
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mongodb
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_assets:/app/assets
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/stickerly-frontend
+      dockerfile: Dockerfile
+    container_name: stikerly_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_uploads:
+  backend_assets:
+  mongodb_data:
