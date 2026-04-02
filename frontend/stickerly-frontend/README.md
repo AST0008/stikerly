@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# Stikerly Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React application for creating AI meme stickers and managing templates.
 
-Currently, two official plugins are available:
+## Responsibilities
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User-facing sticker generation flow.
+- Visual meme template selection.
+- Upload preview and interactive loading states.
+- Result preview with download/share actions.
+- Admin interface for template upload, metadata save, and deletion.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 7
+- Tailwind CSS 4
+- GSAP (`@gsap/react`)
+- Lucide icons
 
-## Expanding the ESLint configuration
+## App structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+├── App.tsx          # main user flow and sticker creation UI
+├── AdminPage.tsx    # admin upload/manage templates UI
+├── index.css
+├── App.css
+└── AdminPage.css
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Routing model
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The frontend uses a simple hash-based switch:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `#` -> user sticker creator
+- `#/admin` -> admin page
+
+No external router dependency is used at this stage.
+
+## Backend integration
+
+Current API base in code: `http://localhost:8000`.
+
+Primary calls:
+
+- `GET /admin/templates` to populate template gallery.
+- `POST /create-sticker` with `FormData(file, template_id?)`.
+- Admin calls to `/admin/templates/upload`, `/admin/templates`, `/admin/templates/{id}`.
+
+Expected sticker response fields:
+
+- `status`
+- `meme_selected`
+- `final_meme_url`
+
+## Local development
+
+```bash
+cd frontend/stickerly-frontend
+npm install
+npm run dev
 ```
+
+Dev server runs at `http://localhost:5173`.
+
+## Build and preview
+
+```bash
+npm run build
+npm run preview
+```
+
+## Docker
+
+Multi-stage build:
+
+1. Build assets with Node 20 Alpine.
+2. Serve static output with NGINX.
+
+Run from repo root with Compose:
+
+```bash
+docker compose up -d --build frontend
+```
+
+Frontend container is exposed at `http://localhost:5173`.
+
+## UX notes
+
+- Drag-and-drop plus click-to-upload entry.
+- Step-by-step loading messages during generation.
+- Template gallery with search and sorting.
+- WhatsApp deep-link sharing on result output.
+- Admin key persisted in local storage for operator convenience.
+
+## Next improvements
+
+- Move API base URL to environment-driven config.
+- Add stronger error boundaries and retry affordances.
+- Introduce route-level code splitting once app grows.
+- Add unit/integration coverage for critical UI flows.
