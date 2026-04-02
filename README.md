@@ -2,6 +2,13 @@
 
 Stikerly is a full-stack app that turns a selfie into a meme-style sticker formatted for WhatsApp. It combines computer vision, template metadata, and a simple web UX so users can generate a usable sticker in one flow instead of manually editing images.
 
+## Video preview
+
+
+[![Watch the Stikerly demo](https://img.youtube.com/vi/H3CKU88KmbU/hqdefault.jpg)](https://www.youtube.com/watch?v=H3CKU88KmbU)
+
+
+
 ## What problem it solves
 
 Most sticker tools break down in one of three places: cutout quality, face placement, or final output format. Stikerly addresses all three in a single pipeline:
